@@ -1,3 +1,0 @@
-pdfminer == 20191125
-
-requests == 2.25.1
