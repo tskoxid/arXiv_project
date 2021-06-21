@@ -1,15 +1,15 @@
-import pandas as pd
 import arxiv
+import logging
 
 
-def get_info_arxiv(id_article: str):
+def get_info_arxiv(id_article: str) -> dict:
+    global paper
     arxiv_dict = {}
     try:
         search = arxiv.Search(id_list=[id_article])
         paper = next(search.get())
     except (arxiv.arxiv.HTTPError, AttributeError):
-        print("Check url")
-        return None
+        logging.warning("Check url")
     arxiv_dict['id'] = id_article
     arxiv_dict['submitter'] = None
     authors = ''
@@ -27,9 +27,7 @@ def get_info_arxiv(id_article: str):
     arxiv_dict['categories'] = categories
     arxiv_dict['license'] = None
     arxiv_dict['abstract'] = paper.summary
-    if isinstance(paper.updated.strftime("%Y-%m-%d"), str):
-        arxiv_dict['update_date'] = paper.updated.strftime("%Y-%m-%d")
-    else:
-        arxiv_dict['update_date'] = paper.published.strftime("%Y-%m-%d")
-    arxiv_df = pd.DataFrame(arxiv_dict, index=[0])
-    return arxiv_df
+    paper_updated = paper.updated.strftime("%Y-%m-%d")
+    arxiv_dict['update_date'] = paper.updated.strftime("%Y-%m-%d") if isinstance(paper_updated, str) else \
+        paper.published.strftime("%Y-%m-%d")
+    return arxiv_dict

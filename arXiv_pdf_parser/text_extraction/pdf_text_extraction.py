@@ -8,6 +8,7 @@ import os
 import re
 import requests
 import json
+import logging
 
 
 class PdfParser:
@@ -69,7 +70,7 @@ class PdfParser:
             input_string = input_string[text_introduction.end() - 3:]
         except AttributeError:
             dict_text['Introduction'] = ''
-            print("Doesn't find any Introduction")
+            logging.info("Doesn't find any Introduction")
 
         try:
             text_related_works = self.search_related_works(input_string)
@@ -77,7 +78,7 @@ class PdfParser:
             input_string = input_string[text_related_works.end() - 3:].replace('.', '\.').replace('[', '\[')
         except AttributeError:
             dict_text['Related_Works'] = ''
-            print("Doesn't find any Related Works")
+            logging.info("Doesn't find any Related Works")
 
         try:
             text_main = self.search_main_text(input_string)
@@ -85,14 +86,14 @@ class PdfParser:
             input_string = input_string[text_main.end() - 13:]
         except AttributeError:
             dict_text['Main'] = ''
-            print("Doesn't find any Main Text")
+            logging.info("Doesn't find any Main Text")
 
         try:
             text_conclusion = self.search_conclusion(input_string)
             dict_text['Conclusion'] = text_conclusion.group(0)[:-11]
         except AttributeError:
             dict_text['Conclusion'] = ''
-            print("Doesn't find any Conclusion in article")
+            logging.info("Doesn't find any Conclusion in article")
 
         return dict_text
 
@@ -140,13 +141,13 @@ class PdfParser:
 
     @staticmethod
     def text_to_file(data: str, count: int):
-        with io.open(os.path.join('output_data/', f'file_{count}.txt'), 'w', encoding='utf8') as file:
+        with io.open(os.path.join('../output_data/', f'file_{count}.txt'), 'w', encoding='utf8') as file:
             file.write(data)
             file.close()
 
     @staticmethod
     def dict_to_json(dict_article: dict, count: int):
-        with open(os.path.join('output_data/', f"file_{count}.json"), "w") as outfile:
+        with open(os.path.join('../output_data/', f"file_{count}.json"), "w") as outfile:
             json.dump(dict_article, outfile)
 
     def pdf_pipeline(self, url: str, count: int):
